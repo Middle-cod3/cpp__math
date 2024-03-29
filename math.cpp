@@ -164,6 +164,7 @@ bool isPrimeBetter(int n)
         return true;
     else
         return false;
+    // return cnt == 0;
 }
 // Optimal ---------->
 // TC :
@@ -346,31 +347,152 @@ void printAllPrimesTillNOptimal(int n)
 // SC :
 
 /*
-6.
+6. Count prime in a range L-R Query based
 ANS :
+Constrains : 0<=10^5
+1<=L<=R<=10^6
 Input :   || Output :
 */
 // Bruteforce ----------->
-// TC :
+// TC :O(qx(R-L+1)xsqrt(N))
 // SC :
+void countPrimesLR(vector<pair<int, int>> q)
+{
+    int n = SZ(q);
+    for (int i = 0; i < n; i++)
+    {
+        int l = q[i].first, r = q[i].second;
+        int cnt = 0;
+        for (int i = l; i <= r; i++)
+        {
+            if (isPrimeBetter(i))
+                cnt++;
+        }
+        cout << cnt << " ";
+    }
+}
 // Better ----------->
-// TC :
+// TC :O(nlog(logN)) for get seive and O(qx(R-L+1)) for countPrime
 // SC :
+vector<int> getSeive(int n)
+{
+    // int prime[n + 1];
+    vector<int> prime(n + 1); // Initialize all elements to 1
+    for (int i = 2; i < n; i++)
+        prime[i] = 1;
+    for (int i = 2; i * i <= n; i++)
+        if (prime[i] == 1)
+            for (int j = i * i; j <= n; j += i)
+                prime[j] = 0;
+    return prime;
+}
+void countPrimesLRBetter(vector<pair<int, int>> q)
+{
+    int n = SZ(q);
+    vector<int> prime = getSeive(1000000);
+    FOR(i, n)
+    {
+        int l = q[i].first, r = q[i].second;
+        int cnt = 0;
+        for (int i = l; i <= r; i++)
+        {
+            if (prime[i] == 1)
+                cnt++;
+        }
+        cout << cnt << " ";
+    }
+}
 // Optimal ---------->
-// TC :
+// TC :O(nlog(logN))+O(n)+O(q)
 // SC :
+// Using prefix sum method
+// instedof saving prime=1 non-prime=0 we're saving total no of primes count in every prime number till t
+void countPrimesLROptimal(vector<pair<int, int>> q)
+{
+    int t = 1000000;
+    int n = SZ(q);
+    vector<int> prime = getSeive(t);
+    int cnt = 0;
+    for (int i = 2; i < t; i++)
+    {
+        cnt = cnt + prime[i];
+        prime[i] = cnt;
+    }
+
+    FOR(i, n)
+    {
+        int l = q[i].first, r = q[i].second;
+        int ans = (prime[r] - prime[l - 1]);
+        cout << ans << " ";
+    }
+}
 
 /*
-7.
+7.Smallest prime factor(SPF)(Query based)
 ANS :
+constrains: n=10^5
 Input :   || Output :
 */
 // Bruteforce ----------->
-// TC :
+// TC :O(q)xO(sqrt(n))
 // SC :
+vector<int> getPrimeFactorisation(int n)
+{
+    vector<int> ans;
+    for (int i = 2; i * i <= n; i++)
+    {
+        if (n % i == 0)
+        {
+            while (n % i == 0) // Here we're decreasing iterations
+            {
+                ans.PB(i);
+                n = n / i; // When n changes within the loop, it simply continues with the next iteration of the loop using the current value of i.
+            }
+        }
+    }
+    if (n != 1)
+        ans.PB(n);
+    return ans;
+}
+void smallesPrimeFactor(vector<int> q)
+{
+    int n = SZ(q);
+    FOR(i, n)
+    {
+        vector<int> ans = getPrimeFactorisation(q[i]);
+        cout << q[i] << " = ";
+        printVector(ans);
+        cout << endl;
+    }
+}
 // Better ----------->
-// TC :
-// SC :
+// TC :O(Nlog(logN))+O(qxlogN)
+// SC :O(N)
+void smallesPrimeFactorBetter(vector<int> q)
+{
+    int t = 100000;
+    int *spf = new int[t + 1]();
+    FOR1(i, t)
+    spf[i] = i;
+    for (int i = 2; i * i <= t; i++)
+        if (spf[i] == i)
+            for (int j = i * i; j <= t; j = j + i)
+                if (spf[j] == j)
+                    spf[j] = i;
+
+    // Here  my spf is ready
+    int n = SZ(q);
+    FOR(i, n)
+    {
+        int qi = q[i];
+        while (qi != 1)
+        {
+            cout << spf[qi] << " ";
+            qi = qi / spf[qi];
+        }
+        cout << endl;
+    }
+}
 // Optimal ---------->
 // TC :
 // SC :
@@ -418,752 +540,6 @@ Input :   || Output :
 // Optimal ---------->
 // TC :
 // SC :
-/*
-11.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-
-/*
-12.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-
-/*
-13.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-
-/*
-14.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-
-/*
-15.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-
-/*
-16.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-
-/*
-17.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-
-/*
-18.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-
-/*
-19.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-
-/*
-20.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-/*
-21.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-
-/*
-22.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-
-/*
-23.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-
-/*
-24.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-
-/*
-25.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-
-/*
-26.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-
-/*
-27.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-
-/*
-28.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-
-/*
-29.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-
-/*
-30.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-/*
-31.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-
-/*
-32.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-
-/*
-33.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-
-/*
-34.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-
-/*
-35.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-
-/*
-36.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-
-/*
-37.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-
-/*
-38.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-
-/*
-39.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-
-/*
-40.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-/*
-41.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-
-/*
-42.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-
-/*
-43.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-
-/*
-44.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-
-/*
-45.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-
-/*
-46.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-
-/*
-47.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-
-/*
-48.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-
-/*
-49.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-
-/*
-50.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-
-/*
-51.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-
-/*
-52.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-
-/*
-53.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-
-/*
-54.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-
-/*
-55.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-
-/*
-56.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-
-/*
-57.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-
-/*
-58.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-
-/*
-59.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
-
-/*
-60.
-ANS :
-Input :   || Output :
-*/
-// Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC :
-// SC :
 
 // ================================MAIN START=================================>>
 int main()
@@ -1182,10 +558,21 @@ int main()
     // vector<int> ans = allPrimeFactorsOptimal(780);
     // vector<int> ans = allPrimeFactorsOptimalsOptimal(780);
     // printVector(ans);
-    int x = 2, n = 21;
+    // int x = 2, n = 21;
     // cout << x << " To the power " << n << " is " << powerExpo(x, n) << endl;
     // printAllPrimesTillNBruteforce(100);
-    printAllPrimesTillNOptimal(100);
+    // printAllPrimesTillNOptimal(20);
+    // cout << endl;
+    // vector<pair<int, int>> q = {{3, 10}, {8, 20}, {1, 5}};
+    // countPrimesLR(q);
+    // cout << endl;
+    // countPrimesLRBetter(q);
+    // cout << endl;
+    // countPrimesLROptimal(q);
+    vector<int> query = {3, 12, 16, 60};
+    smallesPrimeFactor(query);
+    cout << endl;
+    smallesPrimeFactorBetter(query);
     // End code here-------->>
 
     return 0;
